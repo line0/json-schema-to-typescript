@@ -143,6 +143,24 @@ function parseNonLiteral(
 
   switch (type) {
     case 'ALL_OF':
+      if (options.allOfExtendsPattern && schema.allOf?.length === 2) {
+        const [base, extension] = schema.allOf.map(_ => parse(_, options, undefined, processed, usedNames))
+        if (
+          base.type === 'INTERFACE' &&
+          base.standaloneName &&
+          !extension.standaloneName &&
+          !schema.properties?.length
+        ) {
+          return newAllOfExtendsInterface(
+            schema as SchemaSchema,
+            usedNames,
+            base as TNamedInterface,
+            extension as TInterface,
+            keyName,
+          )
+        }
+      }
+
       return {
         comment: schema.description,
         deprecated: schema.deprecated,
@@ -366,6 +384,27 @@ function newInterface(
     params: parseSchema(schema, options, processed, usedNames, name),
     standaloneName: name,
     superTypes: parseSuperTypes(schema, options, processed, usedNames),
+    type: 'INTERFACE',
+  }
+}
+
+function newAllOfExtendsInterface(
+  schema: SchemaSchema,
+  usedNames: UsedNames,
+  base: TNamedInterface,
+  extension: TInterface,
+  keyName?: string,
+  keyNameFromDefinition?: string,
+): TInterface {
+  const name = standaloneName(schema, keyNameFromDefinition, usedNames)!
+
+  return {
+    comment: schema.description,
+    deprecated: schema.deprecated,
+    keyName,
+    params: extension.params,
+    standaloneName: name,
+    superTypes: [base],
     type: 'INTERFACE',
   }
 }

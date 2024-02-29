@@ -12,6 +12,14 @@ export interface Options {
      */
     additionalProperties: boolean;
     /**
+     * Automatically converts object schemas to interface extensions if all of the following conditions are met:
+     * - the object schema has an `allOf` field with exactly two items:
+     * - `allOf[0]` is a `$ref` to a named base interface/object schema
+     * - `allOf[1]` is a (non-referenced) object holding all properties of the extension interface
+     * - the object schema does not have a `properties` field
+     */
+    allOfExtendsPattern: boolean;
+    /**
      * Disclaimer comment prepended to the top of each generated file.
      */
     bannerComment: string;

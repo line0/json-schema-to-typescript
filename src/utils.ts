@@ -219,7 +219,7 @@ export function generateName(from: string, usedNames: Set<string>) {
       nameWithCounter = `${name}${counter}`
       counter++
     }
-    name = nameWithCounter
+    name = nameWithCounter as Capitalize<string>
   }
 
   usedNames.add(name)

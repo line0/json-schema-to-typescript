@@ -64,6 +64,14 @@ function declareNamedInterfaces(ast: AST, options: Options, rootASTName: string,
   }
 
   processed.add(ast)
+
+  const rootAST = processed.values().next().value!
+  // assume that schemas their have their own ID also used to be externally referenced before they were resolved
+  // TODO: that's not necessarily the case, the better solution would be to to remember which schemas were dereferenced
+  if (!options.declareExternallyReferenced && ast.$id && rootAST.$id && ast.$id !== rootAST.$id) {
+    return ''
+  }
+
   let type = ''
 
   switch (ast.type) {
@@ -107,6 +115,13 @@ function declareNamedTypes(ast: AST, options: Options, rootASTName: string, proc
   }
 
   processed.add(ast)
+
+  const rootAST = processed.values().next().value!
+  // assume that schemas their have their own ID also used to be externally referenced before they were resolved
+  // TODO: that's not necessarily the case, the better solution would be to to remember which schemas were dereferenced
+  if (!options.declareExternallyReferenced && ast.$id && rootAST.$id && ast.$id !== rootAST.$id) {
+    return ''
+  }
 
   switch (ast.type) {
     case 'ARRAY':

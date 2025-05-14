@@ -28,6 +28,7 @@ export interface AbstractAST {
   standaloneName?: string
   type: AST_TYPE
   deprecated?: boolean
+  $id?: string
 }
 
 export type ASTWithComment = AST & {comment: string}

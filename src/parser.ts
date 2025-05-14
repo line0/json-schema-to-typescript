@@ -155,6 +155,7 @@ function parseNonLiteral(
         standaloneName: standaloneName(schema, keyNameFromDefinition, usedNames, options),
         params: schema.allOf!.map(_ => parse(_, options, undefined, processed, usedNames)),
         type: 'INTERSECTION',
+        $id: schema.$id,
       }
     case 'ANY':
       return {
@@ -163,6 +164,7 @@ function parseNonLiteral(
         deprecated: schema.deprecated,
         keyName,
         standaloneName: standaloneName(schema, keyNameFromDefinition, usedNames, options),
+        $id: schema.$id,
       }
     case 'ANY_OF':
       return {
@@ -172,6 +174,7 @@ function parseNonLiteral(
         standaloneName: standaloneName(schema, keyNameFromDefinition, usedNames, options),
         params: schema.anyOf!.map(_ => parse(_, options, undefined, processed, usedNames)),
         type: 'UNION',
+        $id: schema.$id,
       }
     case 'BOOLEAN':
       return {
@@ -180,6 +183,7 @@ function parseNonLiteral(
         keyName,
         standaloneName: standaloneName(schema, keyNameFromDefinition, usedNames, options),
         type: 'BOOLEAN',
+        $id: schema.$id,
       }
     case 'CUSTOM_TYPE':
       return {
@@ -189,6 +193,7 @@ function parseNonLiteral(
         params: schema.tsType!,
         standaloneName: standaloneName(schema, keyNameFromDefinition, usedNames, options),
         type: 'CUSTOM_TYPE',
+        $id: schema.$id,
       }
     case 'NAMED_ENUM':
       return {
@@ -201,6 +206,7 @@ function parseNonLiteral(
           keyName: schema.tsEnumNames![n],
         })),
         type: 'ENUM',
+        $id: schema.$id,
       }
     case 'NAMED_SCHEMA':
       return newInterface(schema as SchemaSchema, options, processed, usedNames, keyName)
@@ -211,6 +217,7 @@ function parseNonLiteral(
         keyName,
         standaloneName: standaloneName(schema, keyNameFromDefinition, usedNames, options),
         type: 'NEVER',
+        $id: schema.$id,
       }
     case 'NULL':
       return {
@@ -219,6 +226,7 @@ function parseNonLiteral(
         keyName,
         standaloneName: standaloneName(schema, keyNameFromDefinition, usedNames, options),
         type: 'NULL',
+        $id: schema.$id,
       }
     case 'NUMBER':
       return {
@@ -227,6 +235,7 @@ function parseNonLiteral(
         keyName,
         standaloneName: standaloneName(schema, keyNameFromDefinition, usedNames, options),
         type: 'NUMBER',
+        $id: schema.$id,
       }
     case 'OBJECT':
       return {
@@ -235,6 +244,7 @@ function parseNonLiteral(
         standaloneName: standaloneName(schema, keyNameFromDefinition, usedNames, options),
         type: 'OBJECT',
         deprecated: schema.deprecated,
+        $id: schema.$id,
       }
     case 'ONE_OF':
       return {
@@ -244,6 +254,7 @@ function parseNonLiteral(
         standaloneName: standaloneName(schema, keyNameFromDefinition, usedNames, options),
         params: schema.oneOf!.map(_ => parse(_, options, undefined, processed, usedNames)),
         type: 'UNION',
+        $id: schema.$id,
       }
     case 'REFERENCE':
       throw Error(format('Refs should have been resolved by the resolver!', schema))
@@ -254,6 +265,7 @@ function parseNonLiteral(
         keyName,
         standaloneName: standaloneName(schema, keyNameFromDefinition, usedNames, options),
         type: 'STRING',
+        $id: schema.$id,
       }
     case 'TYPED_ARRAY':
       if (Array.isArray(schema.items)) {
@@ -269,6 +281,7 @@ function parseNonLiteral(
           standaloneName: standaloneName(schema, keyNameFromDefinition, usedNames, options),
           params: schema.items.map(_ => parse(_, options, undefined, processed, usedNames)),
           type: 'TUPLE',
+          $id: schema.$id,
         }
         if (schema.additionalItems === true) {
           arrayType.spreadParam = options.unknownAny ? T_UNKNOWN : T_ANY
@@ -284,6 +297,7 @@ function parseNonLiteral(
           standaloneName: standaloneName(schema, keyNameFromDefinition, usedNames, options),
           params: parse(schema.items!, options, `{keyNameFromDefinition}Items`, processed, usedNames),
           type: 'ARRAY',
+          $id: schema.$id,
         }
       }
     case 'UNION':
@@ -299,6 +313,7 @@ function parseNonLiteral(
           return parse(member, options, undefined, processed, usedNames)
         }),
         type: 'UNION',
+        $id: schema.$id,
       }
     case 'UNNAMED_ENUM':
       return {
@@ -308,6 +323,7 @@ function parseNonLiteral(
         standaloneName: standaloneName(schema, keyNameFromDefinition, usedNames, options),
         params: (schema as EnumJSONSchema).enum!.map(_ => parseLiteral(_, undefined)),
         type: 'UNION',
+        $id: schema.$id,
       }
     case 'UNNAMED_SCHEMA':
       return newInterface(schema as SchemaSchema, options, processed, usedNames, keyName, keyNameFromDefinition)
@@ -329,6 +345,7 @@ function parseNonLiteral(
           spreadParam: maxItems >= 0 ? undefined : params,
           standaloneName: standaloneName(schema, keyNameFromDefinition, usedNames, options),
           type: 'TUPLE',
+          $id: schema.$id,
         }
       }
 
@@ -339,6 +356,7 @@ function parseNonLiteral(
         params,
         standaloneName: standaloneName(schema, keyNameFromDefinition, usedNames, options),
         type: 'ARRAY',
+        $id: schema.$id,
       }
   }
 }
@@ -376,6 +394,7 @@ function newInterface(
     standaloneName: name,
     superTypes: parseSuperTypes(schema, options, processed, usedNames),
     type: 'INTERFACE',
+    $id: schema.$id,
   }
 }
 
@@ -398,6 +417,7 @@ function newAllOfExtendsInterface(
     standaloneName: name,
     superTypes: [base],
     type: 'INTERFACE',
+    $id: schema.$id,
   }
 }
 

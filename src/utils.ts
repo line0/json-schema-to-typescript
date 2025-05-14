@@ -5,6 +5,8 @@ import {JSONSchema4} from 'json-schema'
 import yaml from 'js-yaml'
 import type {Format} from 'cli-color'
 
+export type UsedNames = Map<string, JSONSchema>
+
 // TODO: pull out into a separate package
 export function Try<T>(fn: () => T, err: (e: Error) => any): T {
   try {
@@ -205,24 +207,30 @@ export function toSafeString(string: string) {
   )
 }
 
-export function generateName(from: string, usedNames: Set<string>) {
+export function generateName(from: string, usedNames: UsedNames, schema: JSONSchema) {
   let name = toSafeString(from)
   if (!name) {
     name = 'NoName'
   }
 
-  // increment counter until we find a free name
-  if (usedNames.has(name)) {
-    let counter = 1
-    let nameWithCounter = `${name}${counter}`
-    while (usedNames.has(nameWithCounter)) {
-      nameWithCounter = `${name}${counter}`
-      counter++
-    }
-    name = nameWithCounter as Capitalize<string>
+  let namedSchema = usedNames.get(name)
+  if (namedSchema === undefined) {
+    usedNames.set(name, schema)
+    return name
   }
 
-  usedNames.add(name)
+  let counter = 0,
+    nameWithCounter = name
+  do {
+    if (namedSchema?.$id && schema.$id && namedSchema.$id === schema.$id) {
+      return nameWithCounter
+    }
+    counter++
+    nameWithCounter = `${name}${counter}` as Capitalize<string>
+    namedSchema = usedNames.get(nameWithCounter)
+  } while (namedSchema)
+
+  usedNames.set(name, schema)
   return name
 }
 

@@ -7,6 +7,7 @@ import type {AST, TInterface, TInterfaceParam, TIntersection, TNamedInterface, T
 import {T_ANY, T_ANY_ADDITIONAL_PROPERTIES, T_UNKNOWN, T_UNKNOWN_ADDITIONAL_PROPERTIES} from './types/AST'
 import type {
   EnumJSONSchema,
+  JSONSchema,
   JSONSchemaWithDefinitions,
   LinkedJSONSchema,
   NormalizedJSONSchema,
@@ -14,18 +15,16 @@ import type {
   SchemaType,
 } from './types/JSONSchema'
 import {Intersection, Types, getRootSchema, isBoolean, isPrimitive} from './types/JSONSchema'
-import {generateName, log, maybeStripDefault} from './utils'
+import {generateName, log, maybeStripDefault, UsedNames} from './utils'
 
 export type Processed = Map<NormalizedJSONSchema, Map<SchemaType, AST>>
-
-export type UsedNames = Set<string>
 
 export function parse(
   schema: NormalizedJSONSchema | JSONSchema4Type,
   options: Options,
   keyName?: string,
   processed: Processed = new Map(),
-  usedNames = new Set<string>(),
+  usedNames = new Map<string, JSONSchema>(),
 ): AST {
   if (isPrimitive(schema)) {
     if (isBoolean(schema)) {
@@ -65,7 +64,7 @@ function parseAsTypeWithCache(
   options: Options,
   keyName?: string,
   processed: Processed = new Map(),
-  usedNames = new Set<string>(),
+  usedNames = new Map<string, JSONSchema>(),
 ): AST {
   // If we've seen this node before, return it.
   let cachedTypeMap = processed.get(schema)
@@ -373,7 +372,7 @@ function standaloneName(
   const name =
     options.customName?.(schema, keyNameFromDefinition) || schema.title || schema.$id || keyNameFromDefinition
   if (name) {
-    return generateName(name, usedNames)
+    return generateName(name, usedNames, schema)
   }
 }
 

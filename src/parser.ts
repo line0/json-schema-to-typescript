@@ -145,6 +145,23 @@ function parseNonLiteral(
             keyName,
           )
         }
+
+        if (
+          base.type === 'CUSTOM_TYPE' &&
+          base.params &&
+          !base.standaloneName &&
+          !extension.standaloneName &&
+          !schema.properties?.length
+        ) {
+          return newAllOfExtendsInterface(
+            schema as SchemaSchema,
+            options,
+            usedNames,
+            {...base, standaloneName: base.params, type: 'INTERFACE', superTypes: [], params: []} as TNamedInterface,
+            extension as TInterface,
+            keyName,
+          )
+        }
       }
 
       return {
